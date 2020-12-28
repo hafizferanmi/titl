@@ -45,7 +45,7 @@
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                                 </li>
                             @endif
-                            
+
                             @if (Route::has('register'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
@@ -95,53 +95,62 @@
         }
 
         var x = document.getElementById("demo");
-        function getLocation() {
+        const getLocation = () => {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
+                navigator.geolocation.watchPosition(showPosition, errorHandler ,{ enableHighAccuracy: true, maximumAge: 10000 });
             } else {
                 x.innerHTML = "Geolocation is not supported by this browser.";
             }
         }
 
+        const errorHandler = () => console.log('There is an error')
+
         function showPosition(position) {
             x.innerHTML = "Latitude: " + position.coords.latitude +
             "<br>Longitude: " + position.coords.longitude;
-            console.log('Lat', position.coords.latitude)
-            console.log('Lat', position.coords.longitude)
-        }
 
-        getLocation()
+            // const currentPositionLatitude = position.coords.latitude;
+            // const currentPositionLongitde = position.coords.longitude;
+            const currentPositionLatitude = 7.487413;
+            const currentPositionLongitde = 4.544809;
 
-        function initMap() {
-            const center = {lat: 40.774102, lng: -73.971734};
-            const options = {zoom: 15, scaleControl: true, center: center};
-            map = new google.maps.Map(document.getElementById('map'), options);
+            const center = { lat: currentPositionLatitude, lng: currentPositionLongitde };
+            const options = { zoom: 15, scaleControl: true, center: center };
+            const map = new google.maps.Map(document.getElementById('map'), options);
 
             // Locations of landmarks
-            const dakota = {lat: 40.7767644, lng: -73.9761399};
+            const currentPositonCoordinate =  { lat: currentPositionLatitude, lng: currentPositionLongitde };
 
             const meters = 100
             const coef = meters * 0.0000089;
-            const new_lat = dakota.lat + coef;
+            const secondPostionLatitude = currentPositonCoordinate.lat + coef;
 
-            const new_long = dakota.lng + coef / Math.cos(dakota.lat * 0.018);
-            const frick = {lat: new_lat, lng: new_long};
+            const secondPostionLongitude = currentPositonCoordinate.lng + coef / Math.cos(currentPositonCoordinate.lat * 0.018);
+            const secondPostionCoordinate = { lat: secondPostionLatitude, lng: secondPostionLongitude};
 
 
+            var mk1 = new google.maps.Marker({position: currentPositonCoordinate, map: map});
+            var mk2 = new google.maps.Marker({position: secondPostionCoordinate, map: map});
 
-            // The markers for The Dakota and The Frick Collection
-            var mk1 = new google.maps.Marker({position: dakota, map: map});
-            var mk2 = new google.maps.Marker({position: frick, map: map});
-
-            var line = new google.maps.Polyline({path: [dakota, frick], map: map});
+            var line = new google.maps.Polyline({path: [currentPositonCoordinate, secondPostionCoordinate], map: map});
 
             var distance = haversine_distance(mk1, mk2);
             // document.getElementById('msg').innerHTML = "Distance between markers: " + distance.toFixed(2) + " mi.";
+
+
+            console.log('Lat', position.coords.latitude)
+            console.log('Lat', position.coords.longitude)
+
+
+        }
+
+        function initMap() {
+            getLocation();
         }
     </script>
 
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSgA6QSBVxJ-ZDy_xHG4vtrT65l4PGG8c&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSgA6QSBVxJ-ZDy_xHG4vtrT65l4PGG8c">
     </script>
 </body>
 </html>
